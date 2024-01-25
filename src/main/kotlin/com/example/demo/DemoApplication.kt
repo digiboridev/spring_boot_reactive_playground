@@ -8,4 +8,8 @@ class DemoApplication
 
 fun main(args: Array<String>) {
 	runApplication<DemoApplication>(*args)
+
+	// This is a comment
+	println("Hello, world!")
+
 }
