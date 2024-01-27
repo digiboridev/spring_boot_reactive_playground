@@ -1,5 +1,7 @@
 package com.example.demo
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -27,10 +29,17 @@ class PolyBeanImpl2 : PolyBean {
 }
 
 @Component
-class SomeComponent {
-	fun doSomething() {
-		println("doSomething")
-	}
+class PolyBeanConsumer( private val polyBean: PolyBean ) {
+    @Autowired
+    lateinit var testBean: String
+    @Autowired
+    @Qualifier("testBean2")
+    lateinit var testBeanRenamed: String
+
+    fun doSomething() {
+        println("PolyBeanConsumer doSomething")
+        polyBean.foo()
+    }
 }
 
 
@@ -40,6 +49,11 @@ class DemoApplication {
     @Bean("testBean")
     fun testBean(): String {
         return "123"
+    }
+
+    @Bean("testBean2")
+    fun testBean2(): String {
+        return "456"
     }
 
     @Bean
@@ -61,8 +75,8 @@ fun main(args: Array<String>) {
     val polyBean = context.getBean(PolyBean::class.java)
     polyBean.foo()
 
-	val someComponent = context.getBean(SomeComponent::class.java)
-	someComponent.doSomething()
+    val polyBeanConsumer = context.getBean(PolyBeanConsumer::class.java)
+    polyBeanConsumer.doSomething()
 
 //	repository.save(Person(name = "John_auto1", age = 42))
 
