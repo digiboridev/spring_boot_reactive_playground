@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 import java.util.*
 
 
-@Document( collection = "persons")
+@Document(collection = "persons")
 data class Person(
     @Id
     val id: String = ObjectId().toString(),
@@ -26,5 +26,5 @@ data class Person(
     @LastModifiedDate
     val lastModifiedBy: Date = Date(),
     @Version
-    val version: Long = 1
+    val version: Long = 0
 )
