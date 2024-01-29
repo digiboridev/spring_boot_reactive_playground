@@ -13,7 +13,7 @@ import java.util.Date
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/persons")
 class PersonsController(val personsRepository: PersonsRepository) {
 
     // Validation exception handler
@@ -29,13 +29,9 @@ class PersonsController(val personsRepository: PersonsRepository) {
         )
     }
 
-    @GetMapping("/")
-    fun hello(): String = "Im alive!"
-
-
-    @GetMapping("/persons")
+    @GetMapping()
     fun getPersons(): List<Person> {
-        return listOf(Person("1", "John", 20), Person("2", "Jane", 30))
+        return personsRepository.findAll()
     }
 
     data class NewPersonDTO(
@@ -49,7 +45,7 @@ class PersonsController(val personsRepository: PersonsRepository) {
         val address: String? = null
     )
 
-    @PostMapping("/persons")
+    @PostMapping()
     fun createPerson(@RequestBody @Valid request: NewPersonDTO): Person {
         val nameFree: Boolean = personsRepository.findByName(request.name!!).isEmpty()
         if (!nameFree) {
