@@ -1,7 +1,7 @@
-package com.example.demo
+package com.example.demo.persons
 import org.springframework.data.mongodb.repository.MongoRepository
 
-interface PersonRepository : MongoRepository<Person, String> {
+interface PersonsRepository : MongoRepository<Person, String> {
     fun findByName(name: String): List<Person>
     fun findByAge(age: Int): List<Person>
 }

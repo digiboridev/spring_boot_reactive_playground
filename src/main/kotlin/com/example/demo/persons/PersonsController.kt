@@ -1,4 +1,4 @@
-package com.example.demo
+package com.example.demo.persons
 
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Max
@@ -14,7 +14,7 @@ import java.util.Date
 
 @RestController
 @RequestMapping("/api")
-class PersonsController(val personRepository: PersonRepository) {
+class PersonsController(val personsRepository: PersonsRepository) {
 
     // Validation exception handler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -51,13 +51,13 @@ class PersonsController(val personRepository: PersonRepository) {
 
     @PostMapping("/persons")
     fun createPerson(@RequestBody @Valid request: NewPersonDTO): Person {
-        val nameFree: Boolean = personRepository.findByName(request.name!!).isEmpty()
+        val nameFree: Boolean = personsRepository.findByName(request.name!!).isEmpty()
         if (!nameFree) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is already taken")
         }
 
         val newPerson = Person(name = request.name, age = request.age!!)
-        val personEntity = personRepository.save(newPerson)
+        val personEntity = personsRepository.save(newPerson)
         return personEntity
     }
 }
