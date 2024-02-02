@@ -27,7 +27,6 @@ class SecurityConfig(val jwtService: JWTService) {
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        // Auth filter for
         val authFilter = AuthorizationFilter(jwtService, listOf(usersPath))
 
         http
@@ -44,7 +43,7 @@ class SecurityConfig(val jwtService: JWTService) {
     fun passwordEncoder() = BCryptPasswordEncoder()
 }
 
-
+/// Filter for parsing and inject authentication object into context
 private class AuthorizationFilter(val jwtService: JWTService, val patterns: List<String>) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -95,6 +94,7 @@ private class AuthorizationFilter(val jwtService: JWTService, val patterns: List
     private val tokenErr = RuntimeException("invalid token")
 }
 
+/// Custom authentication object
 data class AppAuthentication(
     val id: String,
     val email: String,

@@ -10,14 +10,14 @@ import java.time.Instant
 
 
 @ControllerAdvice
-class GlobalExceptionHandler {
+class ExceptionHandler {
 
     @ExceptionHandler(BaseException::class)
     fun handleBaseException(ex: BaseException): ResponseEntity<Any> {
         val body = mapOf(
             "timestamp" to Instant.now(),
             "status" to ex.code.value(),
-            "message" to "EH: " +  ex.message
+            "message" to "EHB: " +  ex.message
         )
         return ResponseEntity(body, ex.code)
     }
@@ -27,7 +27,7 @@ class GlobalExceptionHandler {
         val body = mapOf(
             "timestamp" to Instant.now(),
             "status" to 500,
-            "message" to "EH: " + ex.message
+            "message" to "EHE: " + ex.message
         )
         return ResponseEntity(body, HttpStatus.INTERNAL_SERVER_ERROR)
     }
