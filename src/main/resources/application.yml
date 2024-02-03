@@ -9,5 +9,20 @@ spring:
       uri: "mongodb+srv://test123123:p123123@cluster0.qu7uxdd.mongodb.net"
       database: "spring_boot_test"
       auto-index-creation: true
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${SMTP_USER}
+    password: ${SMTP_PASS}
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    sender:
+      email: "no-reply@qwe.rty"
+      text: "no-reply"
 jwt:
   secret: ${JWT_SECRET}
