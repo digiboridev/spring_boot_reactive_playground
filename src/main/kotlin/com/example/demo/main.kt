@@ -17,6 +17,9 @@ private class DemoApplication
 private class GlobalController {
     @GetMapping("/health-check")
     fun healthCheck(): String = "Im alive!"
+
+    @GetMapping("/system/admin-check")
+    fun adminCheck(): String = "Hello sir!"
 }
 
 

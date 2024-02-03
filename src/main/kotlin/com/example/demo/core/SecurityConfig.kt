@@ -1,6 +1,7 @@
 package com.example.demo.core
 
 import com.example.demo.service.JWTService
+import jakarta.servlet.DispatcherType
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -25,22 +26,35 @@ import org.springframework.web.filter.OncePerRequestFilter
 class SecurityConfig(val jwtService: JWTService) {
     private val authPath = "/api/auth/**"
     private val usersPath = "/api/users/**"
+    private val systemPath = "/api/system/**"
+    private val healthCheckPath = "/api/health-check"
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        val authFilter = AuthorizationFilter(jwtService, listOf(authPath,usersPath))
+        val authFilter = AuthorizationFilter(jwtService, listOf(authPath,usersPath,systemPath))
 
         http
             .cors { it.disable() }
             .csrf { it.disable() }
-            .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter::class.java)
-            // can reach auth path only if not authenticated yet
-            .authorizeHttpRequests { it.requestMatchers(authPath).anonymous() }
-            // can reach users path if authenticated with any authority
-            .authorizeHttpRequests { it.requestMatchers(usersPath).authenticated() }
-            // pass all other requests, like error pages, health checks, etc.
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.NEVER) }
+            .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter::class.java)
+            // forward errors that blocked by default if denyAll in the end
+            .authorizeHttpRequests { it.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll() }
+            // anyone can reach health-check endpoint
+            .authorizeHttpRequests { it.requestMatchers(healthCheckPath).permitAll() }
+            // only authenticated users with ADMIN role can reach system endpoints
+            .authorizeHttpRequests { it.requestMatchers(systemPath).hasRole("ADMIN") }
+            // only unauthenticated users can reach auth endpoints
+            .authorizeHttpRequests { it.requestMatchers(authPath).anonymous() }
+            // only authenticated users can reach users endpoints
+            .authorizeHttpRequests { it.requestMatchers(usersPath).authenticated() }
+            // map exceptions properly, by default it always returns 403
+            .exceptionHandling {
+                it.accessDeniedHandler { _, response, _ -> response.sendError(403) }
+                it.authenticationEntryPoint { _, response, _ -> response.sendError(401) }
+            }
+            // deny all other requests
+            .authorizeHttpRequests { it.anyRequest().denyAll() }
 
         return http.build()
     }
@@ -82,7 +96,7 @@ private class AuthorizationFilter(val jwtService: JWTService, val patterns: List
             SecurityContextHolder.getContext().authentication = authentication
             println("authentication: $authentication")
         } catch (e: Exception) {
-            return response.sendError(401, e.message)
+            println("Token parsing error: $e")
         }
 
         // Continue with the request
