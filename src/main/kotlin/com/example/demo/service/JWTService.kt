@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.util.*
@@ -12,8 +13,9 @@ import javax.crypto.SecretKey
 
 
 @Component
-class JWTService {
-    private val secret = "461379486794f3b5752e1ffcf597a274ac31c3afb00987a1e31b6b78a087f552"
+class JWTService{
+    @Value("\${jwt.secret}")
+    private lateinit var secret: String
 
     fun generateToken(claims: Map<String, Any>, subject: String, expires: Instant): String {
         val token = Jwts.builder()

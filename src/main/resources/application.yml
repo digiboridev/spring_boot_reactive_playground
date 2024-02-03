@@ -1,0 +1,13 @@
+
+spring:
+  server:
+    error:
+      include-exception: true
+      include-message: ALWAYS
+  data:
+    mongodb:
+      uri: "mongodb+srv://test123123:p123123@cluster0.qu7uxdd.mongodb.net"
+      database: "spring_boot_test"
+      auto-index-creation: true
+jwt:
+  secret: ${JWT_SECRET}
