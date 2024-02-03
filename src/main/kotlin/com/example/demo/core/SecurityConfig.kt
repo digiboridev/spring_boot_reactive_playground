@@ -23,19 +23,25 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(val jwtService: JWTService) {
+    private val authPath = "/api/auth/**"
     private val usersPath = "/api/users/**"
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        val authFilter = AuthorizationFilter(jwtService, listOf(usersPath))
+        val authFilter = AuthorizationFilter(jwtService, listOf(authPath,usersPath))
 
         http
             .cors { it.disable() }
             .csrf { it.disable() }
             .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter::class.java)
+            // can reach auth path only if not authenticated yet
+            .authorizeHttpRequests { it.requestMatchers(authPath).anonymous() }
+            // can reach users path if authenticated with any authority
             .authorizeHttpRequests { it.requestMatchers(usersPath).authenticated() }
+            // pass all other requests, like error pages, health checks, etc.
             .authorizeHttpRequests { it.anyRequest().permitAll() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.NEVER) }
+
         return http.build()
     }
 
