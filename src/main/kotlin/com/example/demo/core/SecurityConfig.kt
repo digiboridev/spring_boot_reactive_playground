@@ -28,26 +28,28 @@ class SecurityConfig(val jwtService: JWTService) {
     private val usersPath = "/api/users/**"
     private val systemPath = "/api/system/**"
     private val healthCheckPath = "/api/health-check"
+    private val eventsPath = "/api/events/**"
 
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        val authFilter = AuthorizationFilter(jwtService, listOf(authPath,usersPath,systemPath))
+        val authFilter = AuthorizationFilter(jwtService, listOf(authPath, usersPath, systemPath, eventsPath))
 
         http
             .cors { it.disable() }
             .csrf { it.disable() }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.NEVER) }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter::class.java)
-            // forward errors that blocked by default if denyAll in the end
-            .authorizeHttpRequests { it.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll() }
-            // anyone can reach health-check endpoint
+            // forward errors, redirects or async events that blocked by default if denyAll in the end
+            .authorizeHttpRequests {
+                it.dispatcherTypeMatchers(
+                    DispatcherType.ERROR, DispatcherType.ASYNC, DispatcherType.INCLUDE, DispatcherType.FORWARD
+                ).permitAll()
+            }
             .authorizeHttpRequests { it.requestMatchers(healthCheckPath).permitAll() }
-            // only authenticated users with ADMIN role can reach system endpoints
             .authorizeHttpRequests { it.requestMatchers(systemPath).hasRole("ADMIN") }
-            // only unauthenticated users can reach auth endpoints
             .authorizeHttpRequests { it.requestMatchers(authPath).anonymous() }
-            // only authenticated users can reach users endpoints
             .authorizeHttpRequests { it.requestMatchers(usersPath).authenticated() }
+            .authorizeHttpRequests { it.requestMatchers(eventsPath).authenticated() }
             // map exceptions properly, by default it always returns 403
             .exceptionHandling {
                 it.accessDeniedHandler { _, response, _ -> response.sendError(403) }
