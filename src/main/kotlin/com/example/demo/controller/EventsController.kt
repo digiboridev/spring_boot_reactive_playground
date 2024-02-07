@@ -34,20 +34,11 @@ class EventsController(
     @GetMapping("/stream-sse", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun streamSSEEvents(): SseEmitter {
         val emitter = SseEmitter()
-        emitter.send("Connected")
         emitters.add(emitter)
-        emitter.onCompletion {
-            println("Emitter completed")
-            emitters.remove(emitter)
-        }
-        emitter.onTimeout {
-            println("Emitter timeout")
-            emitter.complete()
-        }
-        emitter.onError {
-            println("Emitter error")
-            emitter.complete()
-        }
+        emitter.send("Connected")
+        emitter.onCompletion { emitters.remove(emitter)}
+        emitter.onTimeout {emitter.complete()}
+        emitter.onError { emitter.complete()}
         return emitter
     }
 
@@ -55,18 +46,9 @@ class EventsController(
     fun nextEvent(): DeferredResult<Any> {
         val deferredResult = DeferredResult<Any>(5000)
         deferredResults.add(deferredResult)
-        deferredResult.onCompletion {
-            println("Deferred result completed")
-            deferredResults.remove(deferredResult)
-        }
-        deferredResult.onTimeout {
-            println("Deferred result timeout")
-            deferredResult.setErrorResult("Timeout")
-        }
-        deferredResult.onError {
-            println("Deferred result error")
-            deferredResult.setErrorResult("Error")
-        }
+        deferredResult.onCompletion { deferredResults.remove(deferredResult) }
+        deferredResult.onTimeout { deferredResult.setErrorResult("Timeout") }
+        deferredResult.onError { deferredResult.setErrorResult("Error") }
         return deferredResult
     }
 }

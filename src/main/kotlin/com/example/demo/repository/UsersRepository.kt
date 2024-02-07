@@ -12,9 +12,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UsersRepository : MongoRepository<User, String> {
     fun findByEmail(email: String): User?
-
     fun findAllBy(firstName: TextCriteria): List<PublicUserInfo>
-
     fun findPersonalUserInfoById(id: String): PersonalUserInfo?
     fun findPublicUserById(id: String): PublicUserInfo?
     fun findAllPublicUsersBy(pageable: Pageable): Page<PublicUserInfo>
