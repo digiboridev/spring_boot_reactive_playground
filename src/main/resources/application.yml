@@ -6,7 +6,7 @@ spring:
       include-message: ALWAYS
   data:
     mongodb:
-      uri: "mongodb+srv://test123123:p123123@cluster0.qu7uxdd.mongodb.net"
+      uri: ${MONGODB_URI}
       database: "spring_boot_test"
       auto-index-creation: true
   mail:
