@@ -9,10 +9,7 @@ import jakarta.validation.constraints.NotNull
 import kotlinx.coroutines.GlobalScope
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController()
@@ -46,7 +43,7 @@ class AuthController(
 
         return ResponseEntity.ok().headers {
             it.set(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            it.set(HttpHeaders.SET_COOKIE, "nose=15cm; Path=/; HttpOnly; SameSite=Strict; Secure")
+            it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token; Path=/; HttpOnly; SameSite=Strict; Secure")
         }.body(mapOf("token" to token))
     }
 
@@ -67,7 +64,7 @@ class AuthController(
 
         return ResponseEntity.ok().headers {
             it.set(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            it.set(HttpHeaders.SET_COOKIE, "Authorization=$token; Path=/; HttpOnly; SameSite=Strict; Secure")
+            it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token; Path=/; HttpOnly; SameSite=Strict; Secure")
         }.body(mapOf("token" to token))
     }
 

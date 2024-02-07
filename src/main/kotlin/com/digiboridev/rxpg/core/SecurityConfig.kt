@@ -1,6 +1,7 @@
 package com.digiboridev.rxpg.core
 
 import com.digiboridev.rxpg.service.JWTService
+import kotlinx.coroutines.reactor.mono
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
@@ -12,12 +13,14 @@ import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
+import java.net.URI
 
 
 @Configuration
@@ -40,15 +43,35 @@ class SecurityConfig(
         return http
             .cors { it.disable() }
             .csrf { it.disable() }
+            .oauth2Login {
+                it.authenticationSuccessHandler { webFilterExchange, authentication ->
+                    mono {
+                        if (authentication is OAuth2AuthenticationToken) {
+                            val registrationId = authentication.authorizedClientRegistrationId
+                            val email = authentication.principal.attributes["email"] as String
+                            val emailVerified = authentication.principal.attributes["email_verified"] as Boolean
+                            val subjectId = authentication.principal.attributes["sub"] as String
+                            val name = authentication.principal.attributes["name"] as String
+                            val picture = authentication.principal.attributes["picture"] as String
+                            print("OAuth2Login: $registrationId, $email, $emailVerified, $subjectId, $name, $picture")
+                        }
+                        // TODO upsert user
+                        webFilterExchange.exchange.response.headers.location = URI("/api/health-check")
+                        webFilterExchange.exchange.response.statusCode = org.springframework.http.HttpStatus.FOUND
+                        webFilterExchange.exchange.response.headers.set(HttpHeaders.AUTHORIZATION, "Bearer as")
+                    }.then()
+                }
+            }
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .logout { it.disable() }
             .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
             .authorizeExchange {
+                it.pathMatchers("/login").permitAll()
                 it.pathMatchers(HttpMethod.GET, healthCheckPath).permitAll()
                 it.pathMatchers(systemPath).hasRole("ADMIN")
                 it.pathMatchers(usersPath).authenticated()
-//                it.pathMatchers(eventsPath).authenticated()
+                it.pathMatchers(eventsPath).authenticated()
                 it.anyExchange().permitAll()
             }
             .build()
@@ -70,17 +93,20 @@ class AuthManager : ReactiveAuthenticationManager {
 
 @Component
 class AuthConverter(val jwtService: JWTService) : ServerAuthenticationConverter {
-    override fun convert(exchange: ServerWebExchange): Mono<Authentication> {
+    override fun convert(exchange: ServerWebExchange): Mono<Authentication?> {
+
         val request = exchange.request
         val headerAuth = request.headers.getFirst(HttpHeaders.AUTHORIZATION)?.substring(7)
-        val cookieAuth = request.cookies.getFirst("Authorization")?.value
+        val cookieAuth = request.cookies.getFirst("Authorization")?.value?.substring(7)
+        val queryAuth = request.queryParams.getFirst("token")?.substring(7)
 
         println("headerAuth: $headerAuth")
         println("cookieAuth: $cookieAuth")
+        println("queryAuth: $queryAuth")
 
-        if (headerAuth != null || cookieAuth != null) {
+        if (headerAuth != null || cookieAuth != null || queryAuth != null) {
             try {
-                val token = headerAuth ?: cookieAuth!!
+                val token = headerAuth ?: cookieAuth ?: queryAuth!!
                 val claims = jwtService.extractClaims(token)
                 println("claims: $claims")
 
