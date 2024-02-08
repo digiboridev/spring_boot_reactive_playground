@@ -1,6 +1,7 @@
 package com.digiboridev.rxpg.service
 
 import com.digiboridev.rxpg.core.exceptions.AuthExceptions
+import com.digiboridev.rxpg.core.exceptions.EmailAlreadyTaken
 import com.digiboridev.rxpg.model.User
 import com.digiboridev.rxpg.repository.UsersRepository
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -16,7 +17,7 @@ class AuthService(
 ) {
 
     suspend fun signUp(email: String, password: String, firstName: String, lastName: String): String {
-        usersRepository.findByEmail(email) ?: throw AuthExceptions.EmailAlreadyTaken()
+        usersRepository.findByEmail(email) ?: throw AuthExceptions.emailAlreadyTaken()
 
         val encodedPassword = passwordEncoder.encode(password)
         val userEntity = usersRepository.save(
@@ -36,10 +37,10 @@ class AuthService(
     }
 
     suspend fun signIn(email: String, password: String): String {
-        val userEntity = usersRepository.findByEmail(email) ?: throw AuthExceptions.InvalidCredentials("email")
+        val userEntity = usersRepository.findByEmail(email) ?: throw AuthExceptions.invalidCredentials("email")
 
         if (!passwordEncoder.matches(password, userEntity.password)) {
-            throw AuthExceptions.InvalidCredentials("password")
+            throw AuthExceptions.invalidCredentials("password")
         }
 
         return jwtService.generateToken(

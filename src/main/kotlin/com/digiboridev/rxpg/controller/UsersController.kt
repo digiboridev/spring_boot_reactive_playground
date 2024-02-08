@@ -21,15 +21,13 @@ class UsersController(private val usersRepository: UsersRepository) {
 
     @GetMapping("/me")
     suspend fun me(auth: AppAuthentication): PersonalUserInfo {
-
         val userId = auth.id;
-        return usersRepository.findPersonalUserInfoById(userId) ?: throw UserExceptions.NotFound()
+        return usersRepository.findPersonalUserInfoById(userId) ?: throw UserExceptions.notFound()
     }
 
     @GetMapping("/{id}")
     suspend fun getUserById(@PathVariable id: String): PublicUserInfo {
-
-        return usersRepository.findPublicUserById(id) ?: throw UserExceptions.NotFound()
+        return usersRepository.findPublicUserById(id) ?: throw UserExceptions.notFound()
     }
 
     @GetMapping()
