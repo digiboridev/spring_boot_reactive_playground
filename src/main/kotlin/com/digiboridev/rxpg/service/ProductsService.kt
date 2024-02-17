@@ -26,17 +26,17 @@ class ProductsService(
     val categoriesRepository: CategoriesRepository
 ) {
 
-
-    @OptIn(DelicateCoroutinesApi::class)
-    @PostConstruct
-    fun init() {
-        println("ProductsService initializing...")
-        CoroutineScope(GlobalScope.coroutineContext).launch {
-            fillData(brandsRepository, categoriesRepository, productsRepository)
-        }
-        println("ProductsService initialized")
-
-    }
+//
+//    @OptIn(DelicateCoroutinesApi::class)
+//    @PostConstruct
+//    fun init() {
+//        println("ProductsService initializing...")
+//        CoroutineScope(GlobalScope.coroutineContext).launch {
+//            fillData(brandsRepository, categoriesRepository, productsRepository)
+//        }
+//        println("ProductsService initialized")
+//
+//    }
 }
 
 

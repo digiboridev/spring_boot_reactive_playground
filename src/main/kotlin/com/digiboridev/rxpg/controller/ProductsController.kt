@@ -1,6 +1,5 @@
 package com.digiboridev.rxpg.controller
 
-import com.digiboridev.rxpg.model.Brand
 import com.digiboridev.rxpg.model.Product
 import com.digiboridev.rxpg.repository.ProductsRepository
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +25,7 @@ class ProductsController(val repository: ProductsRepository) {
     }
 
     @GetMapping("/search/{query}")
-    suspend fun search(@PathVariable query: String): Flow<Brand> {
+    suspend fun search(@PathVariable query: String): Flow<Product> {
         val criteria = TextCriteria.forDefaultLanguage().matching(query)
         return repository.findAllBy(criteria)
     }
@@ -42,11 +41,15 @@ class ProductsController(val repository: ProductsRepository) {
     }
 
     @GetMapping("/filter")
-    suspend fun filterByCategoryOrBrand(
+    suspend fun filterByCategoryAndBrand(
         @RequestParam categoryId: String?,
         @RequestParam brandId: String?
     ): Flow<Product> {
-        return repository.findAllByCategoryIdsOrBrandId(categoryId, brandId)
+        return if (categoryId != null && brandId != null) {
+            repository.findByCategoryIdsAndBrandId(categoryId, brandId)
+        } else {
+            repository.findByCategoryIdsOrBrandId(categoryId, brandId)
+        }
     }
 
 }
