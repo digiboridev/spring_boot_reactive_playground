@@ -3,72 +3,66 @@ package com.digiboridev.rxpg.core
 import com.digiboridev.rxpg.core.exceptions.BaseException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.validation.BindException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.support.WebExchangeBindException
+import java.sql.Timestamp
 import java.time.Instant
 
 
 @ControllerAdvice
 class ExceptionHandler {
 
-    @ExceptionHandler(BaseException::class)
-    fun handleBaseException(ex: BaseException): ResponseEntity<Any> {
-        val body = mapOf(
-            "timestamp" to Instant.now(),
-            "status" to ex.code.value(),
-            "message" to "EHB: " +  ex.message
-        )
-        return ResponseEntity(body, ex.code)
-    }
-
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
-    fun handleAnException(ex: Exception): ResponseEntity<Any> {
-        val body = mapOf(
-            "timestamp" to Instant.now(),
-            "status" to 500,
-            "message" to "EHE: " + ex.message
+    fun handleAnException(ex: Exception): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            code = HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            message = HttpStatus.INTERNAL_SERVER_ERROR.reasonPhrase,
+            errors = listOf(ex.message ?: "An unexpected error occurred")
         )
-        return ResponseEntity(body, HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleMethodArgumentNotValid(e: MethodArgumentNotValidException): ResponseEntity<Any> {
-        val errors = e.bindingResult.fieldErrors.map { it.defaultMessage }
-        val body = mapOf(
-            "timestamp" to Instant.now(),
-            "status" to HttpStatus.BAD_REQUEST.value(),
-            "message" to "Invalid request",
-            "errors" to errors,
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException::class)
+    fun handleBindException(ex: BindException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            code = HttpStatus.BAD_REQUEST.value(),
+            message = HttpStatus.BAD_REQUEST.reasonPhrase,
+            errors = ex.fieldErrors.map { it.defaultMessage ?: "An unexpected error occurred" }
         )
-        return ResponseEntity(body, HttpStatus.BAD_REQUEST)
+        return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(WebExchangeBindException::class)
-    fun handleWebExchangeBindException(e: WebExchangeBindException): ResponseEntity<Any> {
-        val errors = e.bindingResult.fieldErrors.map { it.defaultMessage }
-        val body = mapOf(
-            "timestamp" to Instant.now(),
-            "status" to HttpStatus.BAD_REQUEST.value(),
-            "message" to "Invalid request",
-            "errors" to errors,
+    fun handleWebExchangeBindException(ex: WebExchangeBindException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            code = HttpStatus.BAD_REQUEST.value(),
+            message = HttpStatus.BAD_REQUEST.reasonPhrase,
+            errors = ex.fieldErrors.map { it.defaultMessage ?: "An unexpected error occurred" }
         )
-        return ResponseEntity(body, HttpStatus.BAD_REQUEST)
+        return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
     }
 
+    @ExceptionHandler(BaseException::class)
+    fun handleBaseException(ex: BaseException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            code = ex.code.value(),
+            message = ex.code.reasonPhrase,
+            errors = listOf(ex.message ?: "An unexpected error occurred")
+        )
+        return ResponseEntity(errorResponse, ex.code)
+    }
 }
 
-
-interface BaseExceptionResponse {
-    val timestamp: String
-    val code: Int
-    val message: String
-}
-
-interface MultiErrorExceptionResponse {
-    val timestamp: String
-    val code: Int
-    val message: String
-    val errors: List<String>
-}
+data class ErrorResponse(
+    val id : String? = null,
+    val code: Int,
+    val message: String,
+    val errors: List<String>,
+    val timestamp: Instant = Instant.now()
+)

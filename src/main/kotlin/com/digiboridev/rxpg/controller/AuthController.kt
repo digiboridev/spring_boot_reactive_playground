@@ -1,6 +1,6 @@
 package com.digiboridev.rxpg.controller
 
-import com.digiboridev.rxpg.core.BaseExceptionResponse
+import com.digiboridev.rxpg.core.ErrorResponse
 import com.digiboridev.rxpg.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -14,7 +14,10 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 
 @Tag(name = "Auth", description = "Auth endpoints")
@@ -23,6 +26,11 @@ import org.springframework.web.bind.annotation.*
 class AuthController(
     val authService: AuthService
 ) {
+
+    data class SuccessResponse(
+        val token: String
+    )
+
     data class SignUpRequest(
         @field:NotNull(message = "Must include email")
         @field:NotBlank(message = "Name is empty")
@@ -43,34 +51,24 @@ class AuthController(
         val lastName: String?,
     )
 
+
     @Operation(
         summary = "Sign up",
         responses = [
             ApiResponse(
-                responseCode = "200",
-                description = "Sign up successful",
-                content = [Content(schema = Schema(implementation = String::class))]
-            ),
-            ApiResponse(
-                responseCode = "400",
-                description = "Bad request",
-                content = [Content(schema = Schema(implementation = BaseExceptionResponse::class))]
-            ),
-            ApiResponse(
-                responseCode = "409",
-                description = "Email already taken",
-                content = [Content(schema = Schema(implementation = BaseExceptionResponse::class))]
+                responseCode = "409", description = "Conflict",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
             )
         ]
     )
     @PostMapping("/signUp")
-    suspend fun signUp(@RequestBody @Valid request: SignUpRequest): ResponseEntity<Any> {
+    suspend fun signUp(@RequestBody @Valid request: SignUpRequest): ResponseEntity<SuccessResponse> {
         val token = authService.signUp(request.email!!, request.password!!, request.firstName!!, request.lastName!!)
 
         return ResponseEntity.ok().headers {
             it.set(HttpHeaders.AUTHORIZATION, "Bearer $token")
             it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token; Path=/; HttpOnly; SameSite=Strict; Secure")
-        }.body(mapOf("token" to token))
+        }.body(SuccessResponse(token))
     }
 
     data class SignInRequest(
@@ -85,13 +83,13 @@ class AuthController(
     )
 
     @PostMapping("/signIn")
-    suspend fun signIn(@RequestBody @Valid request: SignInRequest): ResponseEntity<Any> {
+    suspend fun signIn(@RequestBody @Valid request: SignInRequest): ResponseEntity<SuccessResponse> {
         val token = authService.signIn(request.email!!, request.password!!)
 
         return ResponseEntity.ok().headers {
             it.set(HttpHeaders.AUTHORIZATION, "Bearer $token")
             it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token; Path=/; HttpOnly; SameSite=Strict; Secure")
-        }.body(mapOf("token" to token))
+        }.body(SuccessResponse(token))
     }
 
 }
