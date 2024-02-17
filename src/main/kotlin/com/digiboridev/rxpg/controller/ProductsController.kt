@@ -2,6 +2,7 @@ package com.digiboridev.rxpg.controller
 
 import com.digiboridev.rxpg.model.Product
 import com.digiboridev.rxpg.repository.ProductsRepository
+import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.http.HttpStatus
@@ -10,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException
 
 // TODO exceptions
 
+@Tag(name = "Products", description = "Products endpoints")
 @RestController
 @RequestMapping("/api/products")
 class ProductsController(val repository: ProductsRepository) {

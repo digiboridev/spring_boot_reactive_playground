@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.support.WebExchangeBindException
 import java.time.Instant
 
 
@@ -44,5 +45,30 @@ class ExceptionHandler {
         return ResponseEntity(body, HttpStatus.BAD_REQUEST)
     }
 
+    @ExceptionHandler(WebExchangeBindException::class)
+    fun handleWebExchangeBindException(e: WebExchangeBindException): ResponseEntity<Any> {
+        val errors = e.bindingResult.fieldErrors.map { it.defaultMessage }
+        val body = mapOf(
+            "timestamp" to Instant.now(),
+            "status" to HttpStatus.BAD_REQUEST.value(),
+            "message" to "Invalid request",
+            "errors" to errors,
+        )
+        return ResponseEntity(body, HttpStatus.BAD_REQUEST)
+    }
+
 }
 
+
+interface BaseExceptionResponse {
+    val timestamp: String
+    val code: Int
+    val message: String
+}
+
+interface MultiErrorExceptionResponse {
+    val timestamp: String
+    val code: Int
+    val message: String
+    val errors: List<String>
+}

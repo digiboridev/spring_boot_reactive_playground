@@ -1,5 +1,6 @@
 package com.digiboridev.rxpg
 
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +22,7 @@ import org.springframework.web.reactive.socket.WebSocketHandler
 import org.springframework.web.reactive.socket.WebSocketSession
 import reactor.core.publisher.Mono
 
-
+@Tag(name = "Global", description = "Global endpoints")
 @RestController
 @RequestMapping("/api")
 private class GlobalController {

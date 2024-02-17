@@ -5,6 +5,7 @@ import com.digiboridev.rxpg.core.exceptions.UserExceptions
 import com.digiboridev.rxpg.dto.PersonalUserInfo
 import com.digiboridev.rxpg.dto.PublicUserInfo
 import com.digiboridev.rxpg.repository.UsersRepository
+import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.web.bind.annotation.*
 
 
+@Tag(name = "Users", description = "Users endpoints")
 @RestController()
 @RequestMapping("/api/users")
 class UsersController(private val usersRepository: UsersRepository) {

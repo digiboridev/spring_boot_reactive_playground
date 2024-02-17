@@ -1,17 +1,23 @@
 package com.digiboridev.rxpg.controller
 
+import com.digiboridev.rxpg.core.BaseExceptionResponse
 import com.digiboridev.rxpg.service.AuthService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import kotlinx.coroutines.GlobalScope
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
+@Tag(name = "Auth", description = "Auth endpoints")
 @RestController()
 @RequestMapping("/api/auth")
 class AuthController(
@@ -37,6 +43,26 @@ class AuthController(
         val lastName: String?,
     )
 
+    @Operation(
+        summary = "Sign up",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Sign up successful",
+                content = [Content(schema = Schema(implementation = String::class))]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Bad request",
+                content = [Content(schema = Schema(implementation = BaseExceptionResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Email already taken",
+                content = [Content(schema = Schema(implementation = BaseExceptionResponse::class))]
+            )
+        ]
+    )
     @PostMapping("/signUp")
     suspend fun signUp(@RequestBody @Valid request: SignUpRequest): ResponseEntity<Any> {
         val token = authService.signUp(request.email!!, request.password!!, request.firstName!!, request.lastName!!)

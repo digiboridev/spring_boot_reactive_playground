@@ -2,6 +2,7 @@ package com.digiboridev.rxpg.controller
 
 import com.digiboridev.rxpg.model.Category
 import com.digiboridev.rxpg.repository.CategoriesRepository
+import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.Flow
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
@@ -12,6 +13,8 @@ import org.springframework.web.server.ResponseStatusException
 
 // TODO exceptions
 
+
+@Tag(name = "Categories", description = "Categories endpoints")
 @RestController
 @RequestMapping("/api/categories")
 class CategoriesController(val repository: CategoriesRepository) {
