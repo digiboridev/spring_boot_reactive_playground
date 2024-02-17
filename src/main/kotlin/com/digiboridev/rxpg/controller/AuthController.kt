@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Auth", description = "Auth endpoints")
 @RestController()
 @RequestMapping("/api/auth")
-class AuthController(
-    val authService: AuthService
-) {
+class AuthController(val authService: AuthService) {
 
     data class SuccessResponse(
         val token: String

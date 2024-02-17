@@ -1,15 +1,12 @@
 package com.digiboridev.rxpg.controller
 
 import com.digiboridev.rxpg.core.AppAuthentication
-import com.digiboridev.rxpg.core.exceptions.UserExceptions
+import com.digiboridev.rxpg.core.exceptions.ResourceException
 import com.digiboridev.rxpg.dto.PersonalUserInfo
 import com.digiboridev.rxpg.dto.PublicUserInfo
 import com.digiboridev.rxpg.repository.UsersRepository
 import io.swagger.v3.oas.annotations.tags.Tag
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.web.bind.annotation.*
@@ -24,12 +21,12 @@ class UsersController(private val usersRepository: UsersRepository) {
     @GetMapping("/me")
     suspend fun me(auth: AppAuthentication): PersonalUserInfo {
         val userId = auth.id;
-        return usersRepository.findPersonalUserInfoById(userId) ?: throw UserExceptions.notFound()
+        return usersRepository.findPersonalUserInfoById(userId) ?: throw ResourceException.notFound("User")
     }
 
     @GetMapping("/{id}")
     suspend fun getUserById(@PathVariable id: String): PublicUserInfo {
-        return usersRepository.findPublicUserById(id) ?: throw UserExceptions.notFound()
+        return usersRepository.findPublicUserById(id) ?: throw ResourceException.notFound("User")
     }
 
     @GetMapping()

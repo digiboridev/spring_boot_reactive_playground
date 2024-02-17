@@ -3,13 +3,13 @@ package com.digiboridev.rxpg.core.exceptions
 import org.springframework.http.HttpStatus
 
 
-sealed class AuthExceptions(code: HttpStatus, message: String) : BaseException(code, message) {
+sealed class AuthException(code: HttpStatus, message: String) : BaseException(code, message) {
 
     companion object Factory {
         fun emailAlreadyTaken() = EmailAlreadyTaken()
-        fun invalidCredentials(name: String) = InvalidCredentials(name)
+        fun invalidCredentials(fieldName: String) = InvalidCredentials(fieldName)
     }
 }
 
-class EmailAlreadyTaken() : AuthExceptions(HttpStatus.CONFLICT, "Email already taken")
-class InvalidCredentials(name: String) : AuthExceptions(HttpStatus.BAD_REQUEST, "Invalid $name")
+class EmailAlreadyTaken() : AuthException(HttpStatus.CONFLICT, "Email already taken")
+class InvalidCredentials(fieldName: String) : AuthException(HttpStatus.BAD_REQUEST, "Invalid $fieldName")

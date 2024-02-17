@@ -4,12 +4,11 @@ import com.digiboridev.rxpg.core.exceptions.BaseException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.BindException
+import org.springframework.web.ErrorResponseException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.support.WebExchangeBindException
-import java.sql.Timestamp
-import java.time.Instant
 
 
 @ControllerAdvice
@@ -59,10 +58,3 @@ class ExceptionHandler {
     }
 }
 
-data class ErrorResponse(
-    val id : String? = null,
-    val code: Int,
-    val message: String,
-    val errors: List<String>,
-    val timestamp: Instant = Instant.now()
-)
