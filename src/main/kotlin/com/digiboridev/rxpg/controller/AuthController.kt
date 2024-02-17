@@ -64,7 +64,7 @@ class AuthController(
 
         return ResponseEntity.ok().headers {
             it.set(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token; Path=/; HttpOnly; SameSite=Strict; Secure")
+            it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token")
         }.body(mapOf("token" to token))
     }
 

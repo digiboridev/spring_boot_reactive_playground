@@ -43,25 +43,25 @@ class SecurityConfig(
         return http
             .cors { it.disable() }
             .csrf { it.disable() }
-            .oauth2Login {
-                it.authenticationSuccessHandler { webFilterExchange, authentication ->
-                    mono {
-                        if (authentication is OAuth2AuthenticationToken) {
-                            val registrationId = authentication.authorizedClientRegistrationId
-                            val email = authentication.principal.attributes["email"] as String
-                            val emailVerified = authentication.principal.attributes["email_verified"] as Boolean
-                            val subjectId = authentication.principal.attributes["sub"] as String
-                            val name = authentication.principal.attributes["name"] as String
-                            val picture = authentication.principal.attributes["picture"] as String
-                            print("OAuth2Login: $registrationId, $email, $emailVerified, $subjectId, $name, $picture")
-                        }
-                        // TODO upsert user
-                        webFilterExchange.exchange.response.headers.location = URI("/api/health-check")
-                        webFilterExchange.exchange.response.statusCode = org.springframework.http.HttpStatus.FOUND
-                        webFilterExchange.exchange.response.headers.set(HttpHeaders.AUTHORIZATION, "Bearer as")
-                    }.then()
-                }
-            }
+//            .oauth2Login {
+//                it.authenticationSuccessHandler { webFilterExchange, authentication ->
+//                    mono {
+//                        if (authentication is OAuth2AuthenticationToken) {
+//                            val registrationId = authentication.authorizedClientRegistrationId
+//                            val email = authentication.principal.attributes["email"] as String
+//                            val emailVerified = authentication.principal.attributes["email_verified"] as Boolean
+//                            val subjectId = authentication.principal.attributes["sub"] as String
+//                            val name = authentication.principal.attributes["name"] as String
+//                            val picture = authentication.principal.attributes["picture"] as String
+//                            print("OAuth2Login: $registrationId, $email, $emailVerified, $subjectId, $name, $picture")
+//                        }
+//                        // TODO upsert user
+//                        webFilterExchange.exchange.response.headers.location = URI("/api/health-check")
+//                        webFilterExchange.exchange.response.statusCode = org.springframework.http.HttpStatus.FOUND
+//                        webFilterExchange.exchange.response.headers.set(HttpHeaders.AUTHORIZATION, "Bearer as")
+//                    }.then()
+//                }
+//            }
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
             .logout { it.disable() }

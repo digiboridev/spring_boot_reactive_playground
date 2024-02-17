@@ -1,5 +1,6 @@
 package com.digiboridev.rxpg
 
+import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.reactive.asFlow
