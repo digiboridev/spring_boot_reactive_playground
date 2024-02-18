@@ -52,6 +52,13 @@ tasks.withType(KotlinCompile) {
 	}
 }
 
+
+
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.bootJar {
+	archiveFileName = 'app.jar'
+	destinationDirectory = file('build')
 }
