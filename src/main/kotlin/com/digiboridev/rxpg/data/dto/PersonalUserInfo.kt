@@ -1,7 +1,7 @@
 package com.digiboridev.rxpg.data.dto
 
 
-import com.digiboridev.rxpg.data.model.Role
+import com.digiboridev.rxpg.data.valueObject.Role
 import com.digiboridev.rxpg.data.model.User
 import java.time.Instant
 

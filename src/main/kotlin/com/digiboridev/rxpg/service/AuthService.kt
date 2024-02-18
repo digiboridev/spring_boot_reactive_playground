@@ -1,21 +1,26 @@
 package com.digiboridev.rxpg.service
 
 import com.digiboridev.rxpg.core.exceptions.AuthException
+import com.digiboridev.rxpg.core.exceptions.ResourceException
+import com.digiboridev.rxpg.data.dto.AuthResponse
 import com.digiboridev.rxpg.data.model.User
+import com.digiboridev.rxpg.data.model.UserSession
+import com.digiboridev.rxpg.data.repository.UserSessionRepository
 import com.digiboridev.rxpg.data.repository.UsersRepository
+import io.jsonwebtoken.ExpiredJwtException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.Instant
-
 
 @Service
 class AuthService(
     val jwtService: JWTService,
     val usersRepository: UsersRepository,
-    val passwordEncoder: PasswordEncoder
+    val passwordEncoder: PasswordEncoder,
+    val userSessionRepository: UserSessionRepository
 ) {
 
-    suspend fun signUp(email: String, password: String, firstName: String, lastName: String): String {
+    suspend fun signUp(email: String, password: String, firstName: String, lastName: String): AuthResponse {
         usersRepository.findByEmail(email) ?: throw AuthException.emailAlreadyTaken()
 
         val encodedPassword = passwordEncoder.encode(password)
@@ -28,190 +33,64 @@ class AuthService(
             )
         )
 
-        return jwtService.generateToken(
-            mapOf("role" to userEntity.role, "email" to userEntity.email),
-            userEntity.id,
-            tExp()
-        )
+        return createSessionTokens(userEntity)
     }
 
-    suspend fun signIn(email: String, password: String): String {
+    suspend fun signIn(email: String, password: String): AuthResponse {
         val userEntity = usersRepository.findByEmail(email) ?: throw AuthException.invalidCredentials("email")
 
         if (!passwordEncoder.matches(password, userEntity.password)) {
             throw AuthException.invalidCredentials("password")
         }
 
-        return jwtService.generateToken(
+        return createSessionTokens(userEntity)
+    }
+
+    suspend fun refreshToken(refreshToken: String): AuthResponse {
+        val claims: Map<String, Any>
+
+        try {
+            claims = jwtService.extractClaims(refreshToken)
+        } catch (e: Exception) {
+            if (e is ExpiredJwtException) throw AuthException.expiredToken()
+            throw AuthException.invalidToken()
+        }
+
+        val sessionId = claims["sessionId"] as String
+        val userSession = userSessionRepository.findById(sessionId) ?: throw AuthException.expiredSession()
+        val userEntity = usersRepository.findById(userSession.userId) ?: throw ResourceException.notFound("User")
+
+        userSessionRepository.delete(userSession)
+
+        return createSessionTokens(userEntity)
+    }
+
+
+    // Creates a new session and a new pair of session tokens
+    private suspend fun createSessionTokens(userEntity: User): AuthResponse {
+        val userSession = UserSession(userId = userEntity.id, expiresAt = refreshExp())
+        userSessionRepository.save(userSession)
+
+        val refreshToken = jwtService.generateToken(
+            mapOf("sessionId" to userSession.id),
+            userEntity.id,
+            refreshExp()
+        )
+
+        val accessToken = jwtService.generateToken(
             mapOf("role" to userEntity.role, "email" to userEntity.email),
             userEntity.id,
-            tExp()
+            accessExp()
         )
+
+        return AuthResponse(accessToken, refreshToken)
     }
 
 
-    // Returns the base time of expiration of the token
-    private fun tExp(): Instant {
-        return Instant.now().plusSeconds(60 * 60)
-    }
+    // Returns the expiration time of the tokens
+    private fun accessExp() = Instant.now().plusSeconds(60 * 60)
+    private fun refreshExp() = Instant.now().plusSeconds(60 * 60 * 24 * 7)
 
-
-    //    @PostConstruct
-    private fun fillData() {
-        println("Filling data")
-        usersRepository.saveAll(mockedUsers())
-    }
-
-
-    private fun mockedUsers() = listOf(
-        // Drone Tailor
-        User(
-            email = "dtailor@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Drone",
-            lastName = "Tailor"
-        ),
-        // John Doe
-        User(
-            email = "jdoe@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "John",
-            lastName = "Doe"
-        ),
-        // Antony Swan
-        User(
-            email = "aswan@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Antony",
-            lastName = "Swan"
-        ),
-        // Jane Doe
-        User(
-            email = "janedoe@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Jane",
-            lastName = "Doe"
-        ),
-        // Mary Johnson
-        User(
-            email = "marryjohnson@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Mary",
-            lastName = "Johnson"
-        ),
-        // John Smith
-        User(
-            email = "jsmith@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "John",
-            lastName = "Smith"
-        ),
-        // Mary Smith
-        User(
-            email = "masmith@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Mary",
-            lastName = "Smith"
-        ),
-        // Antony Johnson
-        User(
-            email = "anjohnson@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Antony",
-            lastName = "Johnson"
-        ),
-        // Jane Smith
-        User(
-            email = "janesmith@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Jane",
-            lastName = "Smith"
-        ),
-        // Antony Doe
-        User(
-            email = "andoe@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Antony",
-            lastName = "Doe"
-        ),
-        // Mary Doe
-        User(
-            email = "mardoe@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Mary",
-            lastName = "Doe"
-        ),
-        // Jane Johnson
-        User(
-            email = "janejonson@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Jane",
-            lastName = "Johnson"
-        ),
-        // John Johnson
-        User(
-            email = "jonjonson@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "John",
-            lastName = "Johnson"
-        ),
-        // Garry Brown
-        User(
-            email = "garrybrown@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Garry",
-            lastName = "Brown"
-        ),
-        // Tony Miller
-        User(
-            email = "tonymiller@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Tony",
-            lastName = "Miller"
-        ),
-        // William Sanders
-        User(
-            email = "willsander@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "William",
-            lastName = "Sanders"
-        ),
-        // Sam Robinson
-        User(
-            email = "samrobinson@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Sam",
-            lastName = "Robinson"
-        ),
-        // Amy White
-        User(
-            email = "amywhite@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Amy",
-            lastName = "White"
-        ),
-        // Mary Black
-        User(
-            email = "maryblack@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Mary",
-            lastName = "Black"
-        ),
-        // Jane Green
-        User(
-            email = "janegreen@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Jane",
-            lastName = "Green"
-        ),
-        // Adam Nelson
-        User(
-            email = "adamnilson@mail.com",
-            password = passwordEncoder.encode("123123"),
-            firstName = "Adam",
-            lastName = "Nelson"
-        ),
-    )
 }
 
 

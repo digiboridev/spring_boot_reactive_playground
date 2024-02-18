@@ -15,11 +15,17 @@ sealed class AuthException(code: HttpStatus, message: String) : BaseException(co
     companion object Factory {
         fun emailAlreadyTaken() = EmailAlreadyTaken()
         fun invalidCredentials(fieldName: String) = InvalidCredentials(fieldName)
+        fun invalidToken() = InvalidToken()
+        fun expiredToken() = ExpiredToken()
+        fun expiredSession() = ExpiredSession()
     }
 }
 
 class EmailAlreadyTaken() : AuthException(HttpStatus.CONFLICT, "Email already taken")
 class InvalidCredentials(fieldName: String) : AuthException(HttpStatus.BAD_REQUEST, "Invalid $fieldName")
+class InvalidToken() : AuthException(HttpStatus.UNAUTHORIZED, "Invalid token")
+class ExpiredToken() : AuthException(HttpStatus.UNAUTHORIZED, "Expired token")
+class ExpiredSession() : AuthException(HttpStatus.UNAUTHORIZED, "Session expired")
 
 
 

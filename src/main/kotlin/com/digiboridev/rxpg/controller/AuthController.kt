@@ -1,5 +1,6 @@
 package com.digiboridev.rxpg.controller
 
+import com.digiboridev.rxpg.data.dto.AuthResponse
 import com.digiboridev.rxpg.data.dto.ErrorResponse
 import com.digiboridev.rxpg.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
@@ -26,10 +27,6 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/auth")
 class AuthController(val authService: AuthService) {
 
-    data class SuccessResponse(
-        val token: String
-    )
-
     data class SignUpRequest(
         @field:NotNull(message = "Must include email")
         @field:NotBlank(message = "Name is empty")
@@ -50,9 +47,7 @@ class AuthController(val authService: AuthService) {
         val lastName: String?,
     )
 
-
     @Operation(
-        summary = "Sign up",
         responses = [
             ApiResponse(
                 responseCode = "409", description = "Conflict",
@@ -61,13 +56,18 @@ class AuthController(val authService: AuthService) {
         ]
     )
     @PostMapping("/signUp")
-    suspend fun signUp(@RequestBody @Valid request: SignUpRequest): ResponseEntity<SuccessResponse> {
-        val token = authService.signUp(request.email!!, request.password!!, request.firstName!!, request.lastName!!)
+    suspend fun signUp(@RequestBody @Valid request: SignUpRequest): ResponseEntity<AuthResponse> {
+        val tokens = authService.signUp(request.email!!, request.password!!, request.firstName!!, request.lastName!!)
 
-        return ResponseEntity.ok().headers {
-            it.set(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token; Path=/; HttpOnly; SameSite=Strict; Secure")
-        }.body(SuccessResponse(token))
+        return ResponseEntity.ok()
+            .headers {
+                it.set(HttpHeaders.AUTHORIZATION, "Bearer ${tokens.accessToken}")
+                it.set(
+                    HttpHeaders.SET_COOKIE,
+                    "Authorization=Bearer ${tokens.accessToken}; Path=/; HttpOnly; SameSite=Strict; Secure"
+                )
+            }
+            .body(tokens)
     }
 
     data class SignInRequest(
@@ -80,9 +80,8 @@ class AuthController(val authService: AuthService) {
         @field:Min(value = 8, message = "Password must be at least 8 characters long")
         val password: String?,
     )
-    
+
     @Operation(
-        summary = "Sign in",
         requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
             content = [Content(
                 examples = [ExampleObject(
@@ -93,21 +92,34 @@ class AuthController(val authService: AuthService) {
                 )]
             )]
         ),
-        responses = [
-            ApiResponse(
-                responseCode = "409", description = "Conflict",
-                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
-            )
-        ]
     )
     @PostMapping("/signIn")
-    suspend fun signIn(@RequestBody @Valid request: SignInRequest): ResponseEntity<SuccessResponse> {
-        val token = authService.signIn(request.email!!, request.password!!)
+    suspend fun signIn(@RequestBody @Valid request: SignInRequest): ResponseEntity<AuthResponse> {
+        val tokens = authService.signIn(request.email!!, request.password!!)
 
-        return ResponseEntity.ok().headers {
-            it.set(HttpHeaders.AUTHORIZATION, "Bearer $token")
-            it.set(HttpHeaders.SET_COOKIE, "Authorization=Bearer $token; Path=/; HttpOnly; SameSite=Strict; Secure")
-        }.body(SuccessResponse(token))
+        return ResponseEntity.ok()
+            .headers {
+                it.set(HttpHeaders.AUTHORIZATION, "Bearer ${tokens.accessToken}")
+                it.set(
+                    HttpHeaders.SET_COOKIE,
+                    "Authorization=Bearer ${tokens.accessToken}; Path=/; HttpOnly; SameSite=Strict; Secure"
+                )
+            }
+            .body(tokens)
     }
 
+    @PostMapping("/refreshToken")
+    suspend fun refreshToken(@RequestBody @NotBlank refreshToken: String): ResponseEntity<AuthResponse> {
+        val tokens = authService.refreshToken(refreshToken)
+
+        return ResponseEntity.ok()
+            .headers {
+                it.set(HttpHeaders.AUTHORIZATION, "Bearer ${tokens.accessToken}")
+                it.set(
+                    HttpHeaders.SET_COOKIE,
+                    "Authorization=Bearer ${tokens.accessToken}; Path=/; HttpOnly; SameSite=Strict; Secure"
+                )
+            }
+            .body(tokens)
+    }
 }
