@@ -45,12 +45,7 @@ class ProductsController(val repository: ProductsRepository) {
         @RequestParam categoryId: String?,
         @RequestParam brandId: String?
     ): Flow<Product> {
-        return if (categoryId != null && brandId != null) {
-            repository.findByCategoryIdsAndBrandId(categoryId, brandId)
-        } else {
-            repository.findByCategoryIdsOrBrandId(categoryId, brandId)
-        }
+        return repository.filterIfPresent(categoryId, brandId)
     }
-
 }
 
