@@ -1,4 +1,4 @@
-package com.digiboridev.rxpg.valueObject
+package com.digiboridev.rxpg.data.valueObject
 
 data class AverageRating(
     val reviews: Int = 0,

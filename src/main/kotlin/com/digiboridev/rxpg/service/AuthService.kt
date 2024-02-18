@@ -1,8 +1,8 @@
 package com.digiboridev.rxpg.service
 
 import com.digiboridev.rxpg.core.exceptions.AuthException
-import com.digiboridev.rxpg.model.User
-import com.digiboridev.rxpg.repository.UsersRepository
+import com.digiboridev.rxpg.data.model.User
+import com.digiboridev.rxpg.data.repository.UsersRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.Instant

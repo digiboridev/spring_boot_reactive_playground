@@ -1,10 +1,10 @@
 package com.digiboridev.rxpg.controller
 
-import com.digiboridev.rxpg.core.AppAuthentication
+import com.digiboridev.rxpg.core.security.AppAuthentication
 import com.digiboridev.rxpg.core.exceptions.ResourceException
-import com.digiboridev.rxpg.dto.PersonalUserInfo
-import com.digiboridev.rxpg.dto.PublicUserInfo
-import com.digiboridev.rxpg.repository.UsersRepository
+import com.digiboridev.rxpg.data.dto.PersonalUserInfo
+import com.digiboridev.rxpg.data.dto.PublicUserInfo
+import com.digiboridev.rxpg.data.repository.UsersRepository
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.domain.PageRequest

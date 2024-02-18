@@ -1,4 +1,4 @@
-package com.digiboridev.rxpg.event
+package com.digiboridev.rxpg.data.event
 
 
 data class BaseEvent(

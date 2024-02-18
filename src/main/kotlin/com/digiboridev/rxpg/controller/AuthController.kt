@@ -1,6 +1,6 @@
 package com.digiboridev.rxpg.controller
 
-import com.digiboridev.rxpg.core.ErrorResponse
+import com.digiboridev.rxpg.data.dto.ErrorResponse
 import com.digiboridev.rxpg.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content

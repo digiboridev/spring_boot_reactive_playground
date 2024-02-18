@@ -1,8 +1,8 @@
 package com.digiboridev.rxpg.controller
 
 import com.digiboridev.rxpg.core.exceptions.ResourceException
-import com.digiboridev.rxpg.model.Product
-import com.digiboridev.rxpg.repository.ProductsRepository
+import com.digiboridev.rxpg.data.model.Product
+import com.digiboridev.rxpg.data.repository.ProductsRepository
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.mongodb.core.query.TextCriteria

@@ -1,4 +1,4 @@
-package com.digiboridev.rxpg.valueObject
+package com.digiboridev.rxpg.data.valueObject
 
 data class PriceRange(
     /// The amount of the price in the smallest unit of the currency (e.g. cents for USD)

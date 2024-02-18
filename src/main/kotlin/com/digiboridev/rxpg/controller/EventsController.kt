@@ -1,6 +1,6 @@
 package com.digiboridev.rxpg.controller
 
-import com.digiboridev.rxpg.event.BaseEvent
+import com.digiboridev.rxpg.data.event.BaseEvent
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.*
 import org.springframework.http.MediaType

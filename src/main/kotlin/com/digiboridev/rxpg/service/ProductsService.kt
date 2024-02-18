@@ -1,21 +1,16 @@
 package com.digiboridev.rxpg.service
 
 //import com.digiboridev.rxpg.model.Category
-import com.digiboridev.rxpg.model.Brand
-import com.digiboridev.rxpg.model.Category
-import com.digiboridev.rxpg.model.Product
-import com.digiboridev.rxpg.repository.BrandsRepository
-import com.digiboridev.rxpg.repository.CategoriesRepository
-import com.digiboridev.rxpg.repository.ProductsRepository
-import com.digiboridev.rxpg.valueObject.Currency
-import com.digiboridev.rxpg.valueObject.Price
-import com.digiboridev.rxpg.valueObject.PriceRange
-import com.digiboridev.rxpg.valueObject.ProductAvailability
-import jakarta.annotation.PostConstruct
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import com.digiboridev.rxpg.data.model.Brand
+import com.digiboridev.rxpg.data.model.Category
+import com.digiboridev.rxpg.data.model.Product
+import com.digiboridev.rxpg.data.repository.BrandsRepository
+import com.digiboridev.rxpg.data.repository.CategoriesRepository
+import com.digiboridev.rxpg.data.repository.ProductsRepository
+import com.digiboridev.rxpg.data.valueObject.Currency
+import com.digiboridev.rxpg.data.valueObject.Price
+import com.digiboridev.rxpg.data.valueObject.PriceRange
+import com.digiboridev.rxpg.data.valueObject.ProductAvailability
 import org.springframework.stereotype.Service
 
 

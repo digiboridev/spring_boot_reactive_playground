@@ -1,6 +1,6 @@
-package com.digiboridev.rxpg.repository
+package com.digiboridev.rxpg.data.repository
 
-import com.digiboridev.rxpg.model.Category
+import com.digiboridev.rxpg.data.model.Category
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository

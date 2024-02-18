@@ -1,33 +1,26 @@
-package com.digiboridev.rxpg.model
+package com.digiboridev.rxpg.data.model
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
-import org.springframework.data.mongodb.core.index.Indexed
-import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
-enum class Role {
-    ADMIN, MANAGER, CUSTOMER
-}
-
-@Document(collection = "users")
-data class User(
+@Document(collection = "categories")
+data class Category(
     @Id
     val id: String = ObjectId().toString(),
 
-    @TextIndexed
-    val firstName: String = "",
-    @TextIndexed
-    val lastName: String = "",
-    val role: Role = Role.CUSTOMER,
-    @Indexed(unique = true)
-    val email: String,
-    val emailVerified : Boolean = false,
-    val password: String,
+    val name: String,
+    val description: String,
+    val image : String? = null,
+
+    // Level of the category in the tree, 0 if it's a root category
+    val level: Int = 0,
+    // Parent category id, null if it's a root category
+    val parentId: String? = null,
 
     @CreatedDate
     val createdAt: Instant = Instant.now(),
@@ -35,4 +28,7 @@ data class User(
     val updatedAt: Instant = Instant.now(),
     @Version
     val version: Long = 0
-)
+) {
+    val isRoot: Boolean
+        get() = level == 0
+}

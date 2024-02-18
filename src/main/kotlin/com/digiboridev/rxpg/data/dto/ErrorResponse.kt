@@ -1,4 +1,4 @@
-package com.digiboridev.rxpg.core
+package com.digiboridev.rxpg.data.dto
 
 import java.time.Instant
 

@@ -1,14 +1,11 @@
-package com.digiboridev.rxpg.repository
+package com.digiboridev.rxpg.data.repository
 
-import com.digiboridev.rxpg.dto.PersonalUserInfo
-import com.digiboridev.rxpg.dto.PublicUserInfo
-import com.digiboridev.rxpg.model.User
+import com.digiboridev.rxpg.data.dto.PersonalUserInfo
+import com.digiboridev.rxpg.data.dto.PublicUserInfo
+import com.digiboridev.rxpg.data.model.User
 import kotlinx.coroutines.flow.Flow
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.query.TextCriteria
-import org.springframework.data.mongodb.repository.MongoRepository
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 

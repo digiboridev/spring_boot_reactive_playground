@@ -1,8 +1,8 @@
 package com.digiboridev.rxpg.controller
 
 import com.digiboridev.rxpg.core.exceptions.ResourceException
-import com.digiboridev.rxpg.model.Category
-import com.digiboridev.rxpg.repository.CategoriesRepository
+import com.digiboridev.rxpg.data.model.Category
+import com.digiboridev.rxpg.data.repository.CategoriesRepository
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.Flow
 import org.springframework.web.bind.annotation.GetMapping

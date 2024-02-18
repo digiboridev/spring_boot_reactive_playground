@@ -1,6 +1,6 @@
-package com.digiboridev.rxpg.dto
+package com.digiboridev.rxpg.data.dto
 
-import com.digiboridev.rxpg.model.User
+import com.digiboridev.rxpg.data.model.User
 
 data class PublicUserInfo(
     val id: String,

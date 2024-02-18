@@ -1,9 +1,9 @@
-package com.digiboridev.rxpg.model
+package com.digiboridev.rxpg.data.model
 
-import com.digiboridev.rxpg.valueObject.AverageRating
-import com.digiboridev.rxpg.valueObject.Price
-import com.digiboridev.rxpg.valueObject.PriceRange
-import com.digiboridev.rxpg.valueObject.ProductAvailability
+import com.digiboridev.rxpg.data.valueObject.AverageRating
+import com.digiboridev.rxpg.data.valueObject.Price
+import com.digiboridev.rxpg.data.valueObject.PriceRange
+import com.digiboridev.rxpg.data.valueObject.ProductAvailability
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id

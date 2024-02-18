@@ -1,6 +1,6 @@
-package com.digiboridev.rxpg.repository
+package com.digiboridev.rxpg.data.repository
 
-import com.digiboridev.rxpg.model.Product
+import com.digiboridev.rxpg.data.model.Product
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate
 import org.springframework.data.mongodb.core.flow
