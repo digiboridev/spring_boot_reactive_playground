@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
+
 @Document(collection = "products")
 data class Product(
     @Id
@@ -36,6 +37,7 @@ data class Product(
     val models: List<Model> = emptyList(),
     val additions: List<Addition> = emptyList(),
 
+    val state: State = State.DRAFT,
 
     @CreatedDate
     val createdAt: Instant = Instant.now(),
@@ -44,6 +46,11 @@ data class Product(
     @Version
     val version: Long = 0
 ) {
+    // Product lifecycle state
+    enum class State {
+        DRAFT, VISIBLE, DISABLED, ARCHIVED
+    }
+
     // Product model represents a specific product variation with different price, sku, and availability
     // For example, Iphone 12 Pro 128GB, Iphone 12 Pro 256GB, etc.
     data class Model(
@@ -60,7 +67,7 @@ data class Product(
     data class ModelProperty(
         val groupName: String,
         val valueCode: String,
-        val valueText : String
+        val valueText: String
     )
 
     // Represents services or sub products that can be added or not to the main product
