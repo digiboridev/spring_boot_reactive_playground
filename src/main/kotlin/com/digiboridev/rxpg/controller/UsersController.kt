@@ -5,6 +5,7 @@ import com.digiboridev.rxpg.core.exceptions.ResourceException
 import com.digiboridev.rxpg.data.dto.PersonalUserInfo
 import com.digiboridev.rxpg.data.dto.PublicUserInfo
 import com.digiboridev.rxpg.data.repository.UsersRepository
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import kotlinx.coroutines.flow.Flow
 import org.springframework.data.domain.PageRequest
@@ -13,10 +14,10 @@ import org.springframework.web.bind.annotation.*
 
 
 @Tag(name = "Users", description = "Users endpoints")
+@SecurityRequirement(name = "bearerAuth")
 @RestController()
 @RequestMapping("/api/users")
 class UsersController(private val usersRepository: UsersRepository) {
-
 
     @GetMapping("/me")
     suspend fun me(auth: AppAuthentication): PersonalUserInfo {

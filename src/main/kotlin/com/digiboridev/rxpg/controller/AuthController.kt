@@ -4,6 +4,7 @@ import com.digiboridev.rxpg.data.dto.ErrorResponse
 import com.digiboridev.rxpg.service.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -79,7 +80,26 @@ class AuthController(val authService: AuthService) {
         @field:Min(value = 8, message = "Password must be at least 8 characters long")
         val password: String?,
     )
-
+    
+    @Operation(
+        summary = "Sign in",
+        requestBody = io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = [Content(
+                examples = [ExampleObject(
+                    value = "{\n" +
+                            "   \"email\":\"dtailor@mail.com\",\n" +
+                            "   \"password\":\"123123\"\n" +
+                            "}"
+                )]
+            )]
+        ),
+        responses = [
+            ApiResponse(
+                responseCode = "409", description = "Conflict",
+                content = [Content(schema = Schema(implementation = ErrorResponse::class))]
+            )
+        ]
+    )
     @PostMapping("/signIn")
     suspend fun signIn(@RequestBody @Valid request: SignInRequest): ResponseEntity<SuccessResponse> {
         val token = authService.signIn(request.email!!, request.password!!)
