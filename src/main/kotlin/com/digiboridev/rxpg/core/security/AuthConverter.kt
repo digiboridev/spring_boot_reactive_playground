@@ -1,5 +1,6 @@
 package com.digiboridev.rxpg.core.security
 
+import com.digiboridev.rxpg.data.valueObject.Role
 import com.digiboridev.rxpg.service.JWTService
 import org.springframework.http.HttpHeaders
 import org.springframework.security.core.Authentication
@@ -33,7 +34,8 @@ class AuthConverter(val jwtService: JWTService) : ServerAuthenticationConverter 
                 val email = claims["email"] as String
 
                 val authorities = listOf(GrantedAuthority { "ROLE_$role" })
-                val auth = AppAuthentication(id, email, authorities)
+
+                val auth = AppAuthentication(id, email, Role.valueOf(role),authorities)
                 return Mono.just(auth)
             } catch (e: Exception) {
                 println("Token parsing error: $e")

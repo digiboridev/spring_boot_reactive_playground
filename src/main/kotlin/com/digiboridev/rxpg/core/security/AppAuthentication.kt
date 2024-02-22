@@ -1,5 +1,6 @@
 package com.digiboridev.rxpg.core.security
 
+import com.digiboridev.rxpg.data.valueObject.Role
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 
@@ -7,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority
 data class AppAuthentication(
     val id: String,
     val email: String,
+    val role : Role,
     private val authorities: Collection<GrantedAuthority>,
     private var authenticated: Boolean = true
 ) : Authentication {
