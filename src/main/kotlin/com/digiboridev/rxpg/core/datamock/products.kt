@@ -1,8 +1,6 @@
 package com.digiboridev.rxpg.core.datamock
 
-import com.digiboridev.rxpg.data.model.Brand
-import com.digiboridev.rxpg.data.model.Category
-import com.digiboridev.rxpg.data.model.Product
+import com.digiboridev.rxpg.data.model.*
 import com.digiboridev.rxpg.data.repository.BrandsRepository
 import com.digiboridev.rxpg.data.repository.CategoriesRepository
 import com.digiboridev.rxpg.data.repository.ProductsRepository
@@ -10,10 +8,6 @@ import com.digiboridev.rxpg.data.valueObject.Currency
 import com.digiboridev.rxpg.data.valueObject.Price
 import com.digiboridev.rxpg.data.valueObject.PriceRange
 import com.digiboridev.rxpg.data.valueObject.ProductAvailability
-import jakarta.annotation.PostConstruct
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 
 
@@ -69,7 +63,6 @@ suspend fun fillData(
             name = "Sub Category 1",
             description = "Sub Category 1 description",
             parentId = cat1.id,
-            level = 1
         )
     )
     val subCat2 = categoriesRepository.save(
@@ -77,7 +70,6 @@ suspend fun fillData(
             name = "Sub Category 2",
             description = "Sub Category 2 description",
             parentId = cat1.id,
-            level = 1
         )
     )
     val subCat3 = categoriesRepository.save(
@@ -85,7 +77,6 @@ suspend fun fillData(
             name = "Sub Category 3",
             description = "Sub Category 3 description",
             parentId = cat1.id,
-            level = 1
         )
     )
     val subCat4 = categoriesRepository.save(
@@ -93,7 +84,6 @@ suspend fun fillData(
             name = "Sub Category 4",
             description = "Sub Category 4 description",
             parentId = cat1.id,
-            level = 1
         )
     )
 
@@ -107,63 +97,63 @@ suspend fun fillData(
             priceRange = PriceRange(100, 200, Currency.USD),
             availability = ProductAvailability.AVAILABLE,
             models = listOf(
-                Product.Model(
+                ProductModel(
                     name = "Model 1",
                     price = Price(100, Currency.USD),
                     sku = "SKU 1",
                     availability = ProductAvailability.AVAILABLE,
                     properties = listOf(
-                        Product.ModelProperty("Color", "color_black", "Black"),
-                        Product.ModelProperty("Memory", "memory_128gb", "128GB")
+                        ModelProperty("Color", "color_black", "Black"),
+                        ModelProperty("Memory", "memory_128gb", "128GB")
                     )
                 ),
-                Product.Model(
+                ProductModel(
                     name = "Model 2",
                     price = Price(200, Currency.USD),
                     sku = "SKU 2",
                     availability = ProductAvailability.AVAILABLE,
                     properties = listOf(
-                        Product.ModelProperty("Color", "color_white", "White"),
-                        Product.ModelProperty("Memory", "memory_128gb", "128GB")
+                        ModelProperty("Color", "color_white", "White"),
+                        ModelProperty("Memory", "memory_128gb", "128GB")
                     )
                 ),
-                Product.Model(
+                ProductModel(
                     name = "Model 3",
                     price = Price(300, Currency.USD),
                     sku = "SKU 3",
                     availability = ProductAvailability.OUT_OF_STOCK,
                     properties = listOf(
-                        Product.ModelProperty("Color", "color_black", "Black"),
-                        Product.ModelProperty("Memory", "memory_256gb", "256GB")
+                        ModelProperty("Color", "color_black", "Black"),
+                        ModelProperty("Memory", "memory_256gb", "256GB")
                     )
                 ),
-                Product.Model(
+                ProductModel(
                     name = "Model 3",
                     price = Price(300, Currency.USD),
                     sku = "SKU 3",
                     availability = ProductAvailability.AVAILABLE,
                     properties = listOf(
-                        Product.ModelProperty("Color", "color_white", "White"),
-                        Product.ModelProperty("Memory", "memory_256gb", "256GB")
+                        ModelProperty("Color", "color_white", "White"),
+                        ModelProperty("Memory", "memory_256gb", "256GB")
                     )
                 )
             ),
             additions = listOf(
-                Product.Addition(
+                ProductAddition(
                     name = "Warranty",
-                    type = Product.Addition.Type.WARRANTY,
+                    type = ProductAddition.Type.WARRANTY,
                     maxQuantity = 1,
                     price = Price(50, Currency.USD)
                 ),
-                Product.Addition(
+                ProductAddition(
                     name = "Case",
-                    type = Product.Addition.Type.ACCESSORY,
+                    type = ProductAddition.Type.ACCESSORY,
                     maxQuantity = 1,
                     price = Price(10, Currency.USD)
                 ),
-                Product.Addition(
+                ProductAddition(
                     name = "Spare battery",
-                    type = Product.Addition.Type.SPARE,
+                    type = ProductAddition.Type.SPARE,
                     maxQuantity = 5,
                     price = Price(5, Currency.USD)
                 )
