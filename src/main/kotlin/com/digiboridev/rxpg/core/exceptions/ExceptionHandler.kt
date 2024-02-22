@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.support.WebExchangeBindException
+import org.springframework.security.access.AccessDeniedException
 
 
 @ControllerAdvice
@@ -24,13 +25,24 @@ class ExceptionHandler {
         return ResponseEntity(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException::class)
+    fun handleAccessDeniedException(ex: AccessDeniedException): ResponseEntity<ErrorResponse> {
+        val errorResponse = ErrorResponse(
+            code = HttpStatus.FORBIDDEN.value(),
+            message = HttpStatus.FORBIDDEN.reasonPhrase,
+            errors = listOf(ex.message ?: "An unexpected error occurred")
+        )
+        return ResponseEntity(errorResponse, HttpStatus.FORBIDDEN)
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BindException::class)
     fun handleBindException(ex: BindException): ResponseEntity<ErrorResponse> {
         val errorResponse = ErrorResponse(
             code = HttpStatus.BAD_REQUEST.value(),
             message = HttpStatus.BAD_REQUEST.reasonPhrase,
-            errors = ex.fieldErrors.map { it.defaultMessage ?: "An unexpected error occurred" }
+            errors = ex.fieldErrors.map { it.field + " " + it.defaultMessage }
         )
         return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
     }
@@ -41,7 +53,7 @@ class ExceptionHandler {
         val errorResponse = ErrorResponse(
             code = HttpStatus.BAD_REQUEST.value(),
             message = HttpStatus.BAD_REQUEST.reasonPhrase,
-            errors = ex.fieldErrors.map { it.defaultMessage ?: "An unexpected error occurred" }
+            errors = ex.fieldErrors.map { it.field + " " + it.defaultMessage }
         )
         return ResponseEntity(errorResponse, HttpStatus.BAD_REQUEST)
     }
