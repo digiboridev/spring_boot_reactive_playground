@@ -8,12 +8,20 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.index.TextIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant
 
 
 @Document(collection = "products")
+@CompoundIndexes(
+    CompoundIndex(name = "brand_category", def = "{'brandId': 1, 'categoryIds': 1}"),
+    CompoundIndex(name = "brand_category_state", def = "{'brandId': 1, 'categoryIds': 1, 'state': 1}"),
+    CompoundIndex(name = "state_updatedAt", def = "{'state': 1, 'updatedAt': 1}"),
+    CompoundIndex(name = "availability_updatedAt", def = "{'availability': 1, 'updatedAt': 1}")
+)
 data class Product(
     @Id
     val id: String = ObjectId().toString(),
@@ -27,11 +35,6 @@ data class Product(
     val categoryIds: List<String>,
     val images: List<String> = emptyList(),
     val averageRating: AverageRating = AverageRating(),
-
-    // Price range between models
-    val priceRange: PriceRange,
-    // Resulting availability of the product based on the models
-    val availability: ProductAvailability = ProductAvailability.AVAILABLE,
 
     val models: List<ProductModel> = emptyList(),
     val additions: List<ProductAddition> = emptyList(),

@@ -32,8 +32,6 @@ class ProductsService(
             categoryIds = product.categoryIds!!,
             images = product.images!!,
             averageRating = AverageRating(),
-            priceRange = priceRange(models),
-            availability = productAvailability(models),
             models = models,
             additions = product.additions!!,
             state = ProductState.DRAFT
@@ -53,8 +51,6 @@ class ProductsService(
             brandId = product.brandId ?: productToUpdate.brandId,
             categoryIds = product.categoryIds ?: productToUpdate.categoryIds,
             images = product.images ?: productToUpdate.images,
-            priceRange = priceRange(models),
-            availability = productAvailability(models),
             models = models,
             additions = product.additions ?: productToUpdate.additions,
             state = product.state ?: productToUpdate.state
@@ -64,7 +60,7 @@ class ProductsService(
     }
 
     // availability of the whole product based on its models
-    fun productAvailability(models: List<ProductModel>): ProductAvailability {
+    private fun productAvailability(models: List<ProductModel>): ProductAvailability {
         val hasAvailable = models.any { it.availability == ProductAvailability.AVAILABLE }
         val hasOutOfStock = models.any { it.availability == ProductAvailability.OUT_OF_STOCK }
 
@@ -74,7 +70,7 @@ class ProductsService(
     }
 
     // price range of the whole product based on its models
-    fun priceRange(models: List<ProductModel>): PriceRange {
+    private fun priceRange(models: List<ProductModel>): PriceRange {
         val minPrice = models.minOf { it.price.amount }
         val maxPrice = models.maxOf { it.price.amount }
         val currency = models.first().price.currency
