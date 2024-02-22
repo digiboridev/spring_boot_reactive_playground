@@ -15,11 +15,7 @@ data class Category(
 
     val name: String,
     val description: String,
-    val image : String? = null,
-
-    // Level of the category in the tree, 0 if it's a root category
-    val level: Int = 0,
-    // Parent category id, null if it's a root category
+    val image: String? = null,
     val parentId: String? = null,
 
     @CreatedDate
@@ -29,6 +25,5 @@ data class Category(
     @Version
     val version: Long = 0
 ) {
-    val isRoot: Boolean
-        get() = level == 0
+    val isRoot: Boolean get() = parentId == null
 }
