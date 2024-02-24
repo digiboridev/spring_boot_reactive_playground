@@ -2,9 +2,11 @@ package com.digiboridev.rxpg.controller
 
 import com.digiboridev.rxpg.core.exceptions.ResourceException
 import com.digiboridev.rxpg.core.security.AppAuthentication
+import com.digiboridev.rxpg.data.dto.BrandData
 import com.digiboridev.rxpg.data.model.Brand
 import com.digiboridev.rxpg.data.repository.BrandsRepository
 import com.digiboridev.rxpg.data.valueObject.Role
+import com.digiboridev.rxpg.service.BrandsService
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
@@ -18,22 +20,29 @@ import org.springframework.web.bind.annotation.*
 @Tag(name = "Brands", description = "Brands endpoints")
 @RestController
 @RequestMapping("/api/brands")
-class BrandsController(val repository: BrandsRepository) {
+class BrandsController(
+    val repository: BrandsRepository,
+    val service: BrandsService
+) {
 
     @GetMapping("/")
-    suspend fun getAll(): Flow<Brand> {
-        return repository.findAll()
+    suspend fun getAll(): Flow<BrandData> {
+        return repository.findAllBrandDataBy()
     }
 
     @GetMapping("/{id}")
-    suspend fun getById(@PathVariable id: String): Brand {
-        return repository.findById(id) ?: throw ResourceException.notFound("Brand")
+    suspend fun getById(@PathVariable id: String): BrandData {
+        return repository.findBrandDataById(id) ?: throw ResourceException.notFound("Brand")
     }
 
-    @GetMapping("/search/{query}")
-    suspend fun search(@PathVariable query: String): Flow<Brand> {
-        val criteria = TextCriteria.forDefaultLanguage().matching(query)
-        return repository.findAllBy(criteria)
+    @GetMapping("/fulltext-search/{query}")
+    suspend fun fullTextSearch(@PathVariable query: String): Flow<BrandData> {
+        return service.fullTextSearch(query)
+    }
+
+    @GetMapping("/vector-search/{query}")
+    suspend fun vectorSearch(@PathVariable query: String): Flow<BrandData> {
+        return service.vectorTextSearch(query)
     }
 
     @PostMapping("/")
