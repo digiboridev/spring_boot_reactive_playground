@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ProductsRepository : CoroutineCrudRepository<Product, String>, CustomizedProductsRepository {
-    suspend fun findAllBy(firstName: TextCriteria): Flow<Product>
+    suspend fun findAllBy(text: TextCriteria): Flow<Product>
     suspend fun findAllByCategoryIds(categoryId: String): Flow<Product>
     suspend fun findAllByBrandId(brandId: String): Flow<Product>
 }
