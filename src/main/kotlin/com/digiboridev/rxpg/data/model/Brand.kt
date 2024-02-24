@@ -21,6 +21,8 @@ data class Brand(
     @TextIndexed
     val description: String,
 
+    val vec : List<Double>? = null,
+
     @CreatedDate
     val createdAt: Instant = Instant.now(),
     @LastModifiedDate
