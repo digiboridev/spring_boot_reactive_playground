@@ -32,5 +32,15 @@ spring:
           google:
             client-id: ${GGL_CLIENT_ID}
             client-secret: ${GGL_CLIENT_SECRET}
+  ai:
+    embedding:
+      transformer:
+        onnx:
+          modelUri: ${ONNX_MODEL_URI}
+        tokenizer:
+          uri: ${TOKENIZER_URI}
 jwt:
   secret: ${JWT_SECRET}
+
+
+
