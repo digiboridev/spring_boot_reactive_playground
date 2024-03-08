@@ -2,7 +2,9 @@ package com.digiboridev.rxpg.core.security
 
 import com.digiboridev.rxpg.data.valueObject.Role
 import com.digiboridev.rxpg.service.JWTService
+import kotlinx.coroutines.reactor.mono
 import org.springframework.http.HttpHeaders
+import org.springframework.http.server.reactive.ServerHttpRequest
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
@@ -12,20 +14,13 @@ import reactor.core.publisher.Mono
 
 @Component
 class AuthConverter(val jwtService: JWTService) : ServerAuthenticationConverter {
+
     override fun convert(exchange: ServerWebExchange): Mono<Authentication?> {
 
-        val request = exchange.request
-        val headerAuth = request.headers.getFirst(HttpHeaders.AUTHORIZATION)?.substring(7)
-        val cookieAuth = request.cookies.getFirst("Authorization")?.value?.substring(7)
-        val queryAuth = request.queryParams.getFirst("token")?.substring(7)
-
-        println("headerAuth: $headerAuth")
-        println("cookieAuth: $cookieAuth")
-        println("queryAuth: $queryAuth")
-
-        if (headerAuth != null || cookieAuth != null || queryAuth != null) {
+       return mono {
+            val request = exchange.request
             try {
-                val token = headerAuth ?: cookieAuth ?: queryAuth!!
+                val token = headerAuth(request) ?: cookieAuth(request) ?: queryAuth(request) ?: return@mono null
                 val claims = jwtService.extractClaims(token)
                 println("claims: $claims")
 
@@ -36,12 +31,25 @@ class AuthConverter(val jwtService: JWTService) : ServerAuthenticationConverter 
                 val authorities = listOf(GrantedAuthority { "ROLE_$role" })
 
                 val auth = AppAuthentication(id, email, Role.valueOf(role),authorities)
-                return Mono.just(auth)
+                auth
             } catch (e: Exception) {
                 println("Token parsing error: $e")
+                null
             }
         }
 
-        return Mono.empty()
+    }
+
+
+    private fun headerAuth (request: ServerHttpRequest): String? {
+        return request.headers.getFirst(HttpHeaders.AUTHORIZATION)?.substring(7)
+    }
+
+    private fun cookieAuth (request: ServerHttpRequest): String? {
+        return request.cookies.getFirst("Authorization")?.value?.substring(7)
+    }
+
+    private fun queryAuth (request: ServerHttpRequest): String? {
+        return request.queryParams.getFirst("token")?.substring(7)
     }
 }
