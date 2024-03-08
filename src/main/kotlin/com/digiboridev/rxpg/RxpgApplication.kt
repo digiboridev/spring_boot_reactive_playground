@@ -1,7 +1,9 @@
 package com.digiboridev.rxpg
 
 import com.digiboridev.rxpg.core.WSHandler
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.servers.Server
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -30,6 +32,7 @@ private class GlobalController {
 @SpringBootApplication
 @EnableReactiveMongoAuditing
 @EnableReactiveMethodSecurity
+@OpenAPIDefinition(servers = [Server(url = "/")])
 class RxpgApplication {
     @Bean
     fun wsMapping(): HandlerMapping {
